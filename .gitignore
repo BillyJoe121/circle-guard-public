@@ -36,6 +36,12 @@ Thumbs.db
 *.log
 logs/
 
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv-ci/
+
 # Node/Expo (Handled in mobile/ but good to have here too)
 node_modules/
 .expo/
