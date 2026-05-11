@@ -1,0 +1,22 @@
+namespace: circleguard-dev
+resources:
+  - ../base
+images:
+  - name: circleguard/circleguard-auth-service
+    newName: circleguard/circleguard-auth-service
+    newTag: dev
+  - name: circleguard/circleguard-identity-service
+    newName: circleguard/circleguard-identity-service
+    newTag: dev
+  - name: circleguard/circleguard-form-service
+    newName: circleguard/circleguard-form-service
+    newTag: dev
+  - name: circleguard/circleguard-promotion-service
+    newName: circleguard/circleguard-promotion-service
+    newTag: dev
+  - name: circleguard/circleguard-notification-service
+    newName: circleguard/circleguard-notification-service
+    newTag: dev
+  - name: circleguard/circleguard-gateway-service
+    newName: circleguard/circleguard-gateway-service
+    newTag: dev

@@ -1,0 +1,59 @@
+pipeline {
+  agent any
+  options { timestamps() }
+  parameters {
+    string(name: 'REGISTRY', defaultValue: 'circleguard', description: 'Docker registry or local image prefix')
+    booleanParam(name: 'PUSH_IMAGES', defaultValue: false, description: 'Push images after build')
+  }
+  environment {
+    DEPLOY_ENV = 'master'
+    IMAGE_TAG = "${env.BUILD_NUMBER}"
+    JAVA_HOME = '/opt/java/openjdk'
+    PATH = "/opt/java/openjdk/bin:${env.PATH}"
+  }
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+    stage('Build And Unit Tests') {
+      steps {
+        sh 'bash ci/run-unit-tests.sh'
+      }
+      post {
+        always { junit allowEmptyResults: true, testResults: 'services/**/build/test-results/test/*.xml' }
+      }
+    }
+    stage('Docker Login') {
+      when { expression { return params.PUSH_IMAGES } }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-registry', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+          sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin'
+        }
+      }
+    }
+    stage('Build Release Images') {
+      steps { sh 'bash ci/build-images.sh "$REGISTRY" "$IMAGE_TAG" "$PUSH_IMAGES"' }
+    }
+    stage('Deploy Master') {
+      steps { sh 'bash ci/deploy-k8s.sh "$DEPLOY_ENV" "$REGISTRY" "$IMAGE_TAG"' }
+    }
+    stage('System Validation') {
+      steps { sh 'bash ci/run-system-tests.sh "$DEPLOY_ENV"' }
+      post {
+        always { junit allowEmptyResults: true, testResults: 'build/system-tests.xml' }
+      }
+    }
+    stage('Performance And Stress') {
+      steps { sh 'bash ci/run-performance-tests.sh "$DEPLOY_ENV" 20 5 1m' }
+      post {
+        always { archiveArtifacts allowEmptyArchive: true, artifacts: 'build/locust/**' }
+      }
+    }
+    stage('Release Notes') {
+      steps {
+        sh 'bash ci/generate-release-notes.sh build/release-notes.md'
+        archiveArtifacts artifacts: 'build/release-notes.md', fingerprint: true
+      }
+    }
+  }
+}

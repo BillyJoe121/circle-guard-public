@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: circleguard-secrets
+type: Opaque
+stringData:
+  postgres-user: admin
+  postgres-password: password
+  neo4j-user: neo4j
+  neo4j-password: password
+  ldap-password: admin
+  jwt-secret: my-super-secret-dev-key-32-chars-long-12345678
+  qr-secret: my-qr-secret-key-for-dev-1234567890
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: circleguard-config
+data:
+  postgres-host: postgres
+  redis-host: redis
+  neo4j-uri: bolt://neo4j:7687
+  kafka-bootstrap-servers: kafka:9092
+  ldap-url: ldap://openldap:389
+  auth-url: http://circleguard-auth-service:8180
+  identity-url: http://circleguard-identity-service:8083
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+data:
+  init-db.sql: |
+    SELECT 'CREATE DATABASE circleguard_auth' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'circleguard_auth')\gexec
+    SELECT 'CREATE DATABASE circleguard_identity' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'circleguard_identity')\gexec
+    SELECT 'CREATE DATABASE circleguard_promotion' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'circleguard_promotion')\gexec
+    SELECT 'CREATE DATABASE circleguard_dashboard' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'circleguard_dashboard')\gexec
+    SELECT 'CREATE DATABASE circleguard_form' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'circleguard_form')\gexec

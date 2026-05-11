@@ -1,0 +1,30 @@
+namespace: circleguard-stage
+resources:
+  - ../base
+patches:
+  - target:
+      kind: Deployment
+      name: circleguard-.*-service
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+images:
+  - name: circleguard/circleguard-auth-service
+    newName: circleguard/circleguard-auth-service
+    newTag: stage
+  - name: circleguard/circleguard-identity-service
+    newName: circleguard/circleguard-identity-service
+    newTag: stage
+  - name: circleguard/circleguard-form-service
+    newName: circleguard/circleguard-form-service
+    newTag: stage
+  - name: circleguard/circleguard-promotion-service
+    newName: circleguard/circleguard-promotion-service
+    newTag: stage
+  - name: circleguard/circleguard-notification-service
+    newName: circleguard/circleguard-notification-service
+    newTag: stage
+  - name: circleguard/circleguard-gateway-service
+    newName: circleguard/circleguard-gateway-service
+    newTag: stage

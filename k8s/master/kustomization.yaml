@@ -1,0 +1,30 @@
+namespace: circleguard-master
+resources:
+  - ../base
+patches:
+  - target:
+      kind: Deployment
+      name: circleguard-.*-service
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+images:
+  - name: circleguard/circleguard-auth-service
+    newName: circleguard/circleguard-auth-service
+    newTag: master
+  - name: circleguard/circleguard-identity-service
+    newName: circleguard/circleguard-identity-service
+    newTag: master
+  - name: circleguard/circleguard-form-service
+    newName: circleguard/circleguard-form-service
+    newTag: master
+  - name: circleguard/circleguard-promotion-service
+    newName: circleguard/circleguard-promotion-service
+    newTag: master
+  - name: circleguard/circleguard-notification-service
+    newName: circleguard/circleguard-notification-service
+    newTag: master
+  - name: circleguard/circleguard-gateway-service
+    newName: circleguard/circleguard-gateway-service
+    newTag: master

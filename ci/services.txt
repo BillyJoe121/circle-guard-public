@@ -1,0 +1,6 @@
+circleguard-auth-service
+circleguard-identity-service
+circleguard-form-service
+circleguard-promotion-service
+circleguard-notification-service
+circleguard-gateway-service
